@@ -4,51 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Search your Sketchfab models</title>
+    <title>Sketchfab - My Search</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
         crossorigin="anonymous">
     <style>
-        #search {
-            display: none;
+        .results {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 10px -5px;
         }
 
-        #search.active {
-            display: block;
-        }
-
-        .results li {
-            list-style: none;
+        .results .card {
+            flex-basis: calc(20% - 10px);
+            margin: 5px;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <form id="login" class="form-inline">
-            <div class="card">
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="token">Sketchfab secret API token:
-                            <a href="https://sketchfab.com/settings/password" target="_blank">(?)</a>
-                        </label>
-                        <input class="form-control" type="password" name="token" id="token">
-                        <button class="btn btn-primary">Login</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <form id="search" class="form-inline">
-            <div class="card">
-                <div class="card-body">
-                    <div class="form-group">
-                        <input class="form-control" type="search" name="q" value="" placeholder="Search your models">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div class="results"></div>
-    </div>
+    <div id="root"></div>
 </body>
 
 </html>

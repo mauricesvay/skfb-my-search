@@ -2,6 +2,7 @@ const axios = require('axios');
 const BASE_URL = 'https://api.sketchfab.com';
 const COLLECTIONS_ENDPOINT = '/v3/collections';
 const MODELS_ENDPOINT = '/v3/models';
+const ME_ENDPOINT = '/v3/me';
 const MY_MODELS_ENDPOINT = '/v3/me/models';
 const SEARCH_ENDPOINT = '/v3/search';
 const USERS_ENDPOINT = '/v3/users';
@@ -131,5 +132,17 @@ Sketchfab.prototype.getUserByUid = function getUserByUid(uid) {
 Sketchfab.prototype.getUserByUsername = function getUserByUsername(username) {
     return this.getUserByUid(`@${username}`);
 };
+
+Sketchfab.prototype.me = function() {
+    var instance = this.getAxiosInstance();
+    return new Promise((resolve, reject) => {
+        instance
+            .get(ME_ENDPOINT)
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(reject);
+    });
+}
 
 module.exports = Sketchfab;
