@@ -1,11 +1,11 @@
-const axios = require('axios');
-const BASE_URL = 'https://api.sketchfab.com';
-const COLLECTIONS_ENDPOINT = '/v3/collections';
-const MODELS_ENDPOINT = '/v3/models';
-const ME_ENDPOINT = '/v3/me';
-const MY_MODELS_ENDPOINT = '/v3/me/models';
-const SEARCH_ENDPOINT = '/v3/search';
-const USERS_ENDPOINT = '/v3/users';
+const axios = require("axios");
+const BASE_URL = "https://api.sketchfab.com";
+const COLLECTIONS_ENDPOINT = "/v3/collections";
+const MODELS_ENDPOINT = "/v3/models";
+const ME_ENDPOINT = "/v3/me";
+const MY_MODELS_ENDPOINT = "/v3/me/models";
+const SEARCH_ENDPOINT = "/v3/search";
+const USERS_ENDPOINT = "/v3/users";
 
 function Sketchfab(auth) {
     this.auth = auth;
@@ -50,10 +50,7 @@ Sketchfab.prototype.getMyModels = function getModels(options) {
     });
 };
 
-Sketchfab.prototype.getModelsInCollection = function getModelsInCollection(
-    uid,
-    options
-) {
+Sketchfab.prototype.getModelsInCollection = function getModelsInCollection(uid, options) {
     var instance = this.getAxiosInstance();
     return new Promise((resolve, reject) => {
         instance
@@ -68,7 +65,7 @@ Sketchfab.prototype.getModelsInCollection = function getModelsInCollection(
 };
 
 Sketchfab.prototype.searchModels = function searchModels(options) {
-    options.type = 'models';
+    options.type = "models";
     var instance = this.getAxiosInstance();
     return new Promise((resolve, reject) => {
         instance
@@ -105,7 +102,7 @@ Sketchfab.prototype.getUsers = function getUsers(options) {
 };
 
 Sketchfab.prototype.searchUsers = function searchUsers(options) {
-    options.type = 'users';
+    options.type = "users";
     var instance = this.getAxiosInstance();
     return new Promise((resolve, reject) => {
         instance
@@ -143,6 +140,6 @@ Sketchfab.prototype.me = function() {
             })
             .catch(reject);
     });
-}
+};
 
 module.exports = Sketchfab;

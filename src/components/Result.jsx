@@ -15,9 +15,20 @@ function Result(props) {
     return (
         <div className="card">
             <a href={model.viewerUrl} target="_blank">
-            <span className="card-img-top" style={{backgroundImage: 'url('+getImage(model).url+')', backgroundSize:"cover", height:120, display:"block"}}></span>
+                <span
+                    className="card-img-top"
+                    style={{
+                        backgroundImage: "url(" + getImage(model).url + ")",
+                        backgroundSize: "cover",
+                        height: 120,
+                        display: "block"
+                    }}
+                />
                 <div className="card-body">
-                    <span>{model.name} {model.isPrivate ? " (private) ":""} {model.publishedAt ? '' : <span class="badge badge-secondary">draft</span>}</span>
+                    <span>
+                        {model.name} {model.isPrivate ? " (private) " : ""}{" "}
+                        {model.publishedAt ? "" : <span class="badge badge-secondary">draft</span>}
+                    </span>
                 </div>
             </a>
         </div>

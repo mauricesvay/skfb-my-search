@@ -1,25 +1,25 @@
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: ['babel-polyfill', './src/index.js'],
+    entry: ["babel-polyfill", "./src/index.js"],
     output: {
-        path: __dirname + '/dist',
-        filename: 'bundle.js'
+        path: __dirname + "/dist",
+        filename: "bundle.js"
     },
-    devtool: 'sourcemap',
+    devtool: "sourcemap",
     module: {
         loaders: [
             {
                 test: /\.jsx?$/,
                 exclude: /(node_modules)/,
-                loader: 'babel-loader'
+                loader: "babel-loader"
             }
         ]
     },
     plugins: [
         new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: 'src/index.html'
+            filename: "index.html",
+            template: "src/index.html"
         })
     ]
 };

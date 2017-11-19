@@ -1,5 +1,5 @@
 import React from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import Result from "./Result.jsx";
 import Login from "./Login.jsx";
 import Searchbar from "./Searchbar.jsx";
@@ -49,7 +49,7 @@ class App extends React.Component {
     }
 
     logout() {
-        Cookies.remove('token');
+        Cookies.remove("token");
         this.modelStore.clear();
         this.setState({
             indexCount: 0,

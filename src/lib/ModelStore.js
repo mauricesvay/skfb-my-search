@@ -16,20 +16,23 @@ class ModelStore {
     }
     info() {
         var info = {};
-        return new Promise((resolve, reject)=> {
+        return new Promise((resolve, reject) => {
             if (this.index) {
                 info.indexCount = this.index.toJSON().documentStore.length;
             } else {
                 info.indexCount = 0;
             }
-            
-            this.metadata.getItem('syncedAt').then((syncedAt)=>{
-                info.syncedAt = syncedAt;
-                return this.store.length();
-            }).then((count)=>{
-                info.storeCount = count;
-                resolve(info);
-            });
+
+            this.metadata
+                .getItem("syncedAt")
+                .then(syncedAt => {
+                    info.syncedAt = syncedAt;
+                    return this.store.length();
+                })
+                .then(count => {
+                    info.storeCount = count;
+                    resolve(info);
+                });
         });
     }
     clear() {

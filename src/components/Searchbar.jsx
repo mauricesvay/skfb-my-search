@@ -1,13 +1,12 @@
 import React from "react";
-import relativedate from 'relative-date';
+import relativedate from "relative-date";
 
 class Searchbar extends React.Component {
-
     constructor(props) {
         super(props);
-        this.state =  {
+        this.state = {
             q: ""
-        }
+        };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSync = this.handleSync.bind(this);
@@ -48,18 +47,34 @@ class Searchbar extends React.Component {
             var date = this.props.syncedAt ? relativedate(this.props.syncedAt) : "never";
             return (
                 <span>
-                    Last sync: <a href="#" onClick={this.handleSync} title="Sync now">🔄</a> <span>{date}</span>
+                    Last sync:{" "}
+                    <a href="#" onClick={this.handleSync} title="Sync now">
+                        🔄
+                    </a>{" "}
+                    <span>{date}</span>
                 </span>
             );
         }
     }
 
     render() {
-        return <nav className="navbar navbar-light bg-light">
+        return (
+            <nav className="navbar navbar-light bg-light">
                 <div className="container">
                     <form id="search" className="form-inline active" onSubmit={this.handleSubmit}>
                         <div className="input-group">
-                            <input autoComplete="off" autoFocus className="form-control" size="60" type="search" id="q" name="q" value={this.state.q} placeholder="Search your models" onChange={this.handleChange} />
+                            <input
+                                autoComplete="off"
+                                autoFocus
+                                className="form-control"
+                                size="60"
+                                type="search"
+                                id="q"
+                                name="q"
+                                value={this.state.q}
+                                placeholder="Search your models"
+                                onChange={this.handleChange}
+                            />
                             <span className="input-group-btn">
                                 <button className="btn btn-primary" type="submit">
                                     Search
@@ -72,14 +87,17 @@ class Searchbar extends React.Component {
                             <span className="searchbar--models">
                                 {this.props.indexCount} models
                             </span>
-                            { " - " }
+                            {" - "}
                             {this.renderSync()}
-                            { " - " }
-                            <a href="#" onClick={this.handleLogout} title="Clear local data">Log out</a>
+                            {" - "}
+                            <a href="#" onClick={this.handleLogout} title="Clear local data">
+                                Log out
+                            </a>
                         </span>
                     </div>
                 </div>
-            </nav>;
+            </nav>
+        );
     }
 }
 

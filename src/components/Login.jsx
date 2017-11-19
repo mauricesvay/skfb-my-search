@@ -1,5 +1,5 @@
 import React from "react";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import Sketchfab from "../lib/sketchfab";
 
 class Login extends React.Component {
@@ -13,7 +13,7 @@ class Login extends React.Component {
     }
 
     componentDidMount() {
-        var token = Cookies.get('token');
+        var token = Cookies.get("token");
         if (token) {
             this.login(token);
         }
@@ -33,11 +33,11 @@ class Login extends React.Component {
         client
             .me()
             .then(() => {
-                Cookies.set('token', token, { expires: 365 });
+                Cookies.set("token", token, { expires: 365 });
                 this.props.onLogin(token);
             })
             .catch(() => {
-                Cookies.remove('token');
+                Cookies.remove("token");
                 alert("Login error: invalid token");
             });
     }
