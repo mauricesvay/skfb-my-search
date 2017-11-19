@@ -1,9 +1,11 @@
 import React from "react";
 import Cookies from "js-cookie";
+import debounce from "lodash.debounce";
 import Result from "./Result.jsx";
 import Login from "./Login.jsx";
 import Searchbar from "./Searchbar.jsx";
 import ModelStore from "../lib/ModelStore";
+import ModelIndex from "../lib/ModelIndex";
 
 class App extends React.Component {
     constructor(props) {
@@ -11,41 +13,66 @@ class App extends React.Component {
         this.state = {
             indexCount: 0,
             syncedAt: null,
+            isIndexing: false,
             isSyncing: false,
             results: [],
             hasSearch: false,
             token: null
         };
         this.modelStore = new ModelStore();
-        this.init();
     }
 
     init() {
-        this.modelStore
-            .buildIndex()
-            .then(() => {
-                return this.modelStore.info();
-            })
-            .then(info => {
-                this.setState({
-                    indexCount: info.indexCount,
-                    syncedAt: info.syncedAt
-                });
+        // Update status
+        this.updateSyncedAt();
 
-                // Initial sync
-                if (info.syncedAt === null) {
-                    this.sync();
-                }
+        this.modelIndex = new ModelIndex(this.modelStore);
+        this.setState({
+            isIndexing: true
+        })
+        this.modelIndex.init().then(count => {
+            this.setState({
+                isIndexing: false
+            })
+            //Initial sync
+            if (count === 0) {
+                this.sync();
+            }
+        });
+
+        // Keep index in sync with store
+        this.modelStore.on("add", model => {
+            this.modelIndex.add(model);
+        });
+        this.modelStore.on("remove", model => {
+            this.modelIndex.remove(model);
+        });
+
+        var getCount = debounce(() => {
+            this.setState({
+                indexCount: this.modelIndex.getCount()
             });
+        }, 16);
+        this.modelIndex.on("add", getCount);
+        this.modelIndex.on("remove", getCount);
+    }
+
+    updateSyncedAt() {
+        return new Promise((resolve, reject) => {
+            this.modelStore
+                .info()
+                .then(syncedAt => {
+                    this.setState({
+                        syncedAt: syncedAt
+                    });
+                    resolve();
+                })
+                .catch(reject);
+        });
     }
 
     login(token) {
-        this.setState(
-            {
-                token: token
-            },
-            this.init.bind(this)
-        );
+        this.setState({ token: token }, this.init.bind(this));
     }
 
     logout() {
@@ -64,15 +91,16 @@ class App extends React.Component {
 
     search(q) {
         this.setState({ hasSearch: true });
-        try {
-            this.modelStore.search(q).then(results => {
+        this.modelIndex
+            .search(q)
+            .then(results => {
                 this.setState({
                     results: results
                 });
+            })
+            .catch(error => {
+                console.error(error);
             });
-        } catch (error) {
-            console.log(error);
-        }
     }
 
     sync() {
@@ -81,17 +109,8 @@ class App extends React.Component {
             this.modelStore
                 .sync(this.state.token)
                 .then(() => {
-                    return this.modelStore.buildIndex();
-                })
-                .then(() => {
-                    return this.modelStore.info();
-                })
-                .then(info => {
-                    this.setState({
-                        indexCount: info.indexCount,
-                        syncedAt: info.syncedAt
-                    });
                     this.setState({ isSyncing: false });
+                    return this.updateSyncedAt();
                 })
                 .catch(error => {
                     this.setState({ isSyncing: false });
@@ -131,6 +150,7 @@ class App extends React.Component {
                     <Searchbar
                         indexCount={this.state.indexCount}
                         isSyncing={this.state.isSyncing}
+                        isIndexing={this.state.isIndexing}
                         onSearch={this.search.bind(this)}
                         onSync={this.sync.bind(this)}
                         syncedAt={this.state.syncedAt}

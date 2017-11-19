@@ -19,6 +19,10 @@ class Searchbar extends React.Component {
             console.log("Replay search");
             this.props.onSearch(this.state.q);
         }
+        if (this.props.isIndexing && !nextProps.isIndexing && this.state.q != "") {
+            console.log("Replay search");
+            this.props.onSearch(this.state.q);
+        }
     }
 
     handleChange(event) {
@@ -85,7 +89,7 @@ class Searchbar extends React.Component {
                     <div>
                         <span className="navbar-text">
                             <span className="searchbar--models">
-                                {this.props.indexCount} models
+                                {this.props.indexCount}{this.props.isIndexing ? "+" : ""} models 
                             </span>
                             {" - "}
                             {this.renderSync()}
