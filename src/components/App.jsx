@@ -99,7 +99,6 @@ class App extends React.Component {
             this.modelStore
                 .getAll()
                 .then(models => {
-                    console.log(models);
                     this.setState({ results: models });
                 })
                 .catch(() => {
@@ -173,7 +172,9 @@ class App extends React.Component {
                         syncedAt={this.state.syncedAt}
                         onLogout={this.logout.bind(this)}
                     />
-                    <div className="container">{this.renderResults()}</div>
+                    <div className="container">
+                        <div className="list-group">{this.renderResults()}</div>
+                    </div>
                 </div>
             );
         } else {
