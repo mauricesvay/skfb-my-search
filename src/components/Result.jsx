@@ -27,7 +27,11 @@ function Result(props) {
                 <div className="card-body">
                     <span>
                         {model.name} {model.isPrivate ? " (private) " : ""}{" "}
-                        {model.publishedAt ? "" : <span className="badge badge-secondary">draft</span>}
+                        {model.publishedAt ? (
+                            ""
+                        ) : (
+                            <span className="badge badge-secondary">draft</span>
+                        )}
                     </span>
                 </div>
             </a>

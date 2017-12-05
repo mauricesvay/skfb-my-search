@@ -89,7 +89,8 @@ class Searchbar extends React.Component {
                     <div>
                         <span className="navbar-text">
                             <span className="searchbar--models">
-                                {this.props.indexCount}{this.props.isIndexing ? "+" : ""} models 
+                                {this.props.indexCount}
+                                {this.props.isIndexing ? "+" : ""} models
                             </span>
                             {" - "}
                             {this.renderSync()}
