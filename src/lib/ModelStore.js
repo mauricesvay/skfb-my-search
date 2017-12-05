@@ -67,7 +67,7 @@ class ModelStore extends EventEmitter {
             //Prune stale models
             try {
                 await this.prune(syncDate);
-            } catch(error) {
+            } catch (error) {
                 console.error(error);
             }
 
@@ -103,14 +103,14 @@ class ModelStore extends EventEmitter {
         return new Promise((resolve, reject) => {
             this.store
                 .iterate((model, key, i) => {
-                    all.sort(function(a,b){
+                    all.push(model);
+                })
+                .then(() => {
+                    all.sort(function(a, b) {
                         var aTime = +new Date(a.createdAt);
                         var bTime = +new Date(b.createdAt);
                         return bTime - aTime;
                     });
-                    all.push(model);
-                })
-                .then(() => {
                     resolve(all);
                 })
                 .catch(reject);
