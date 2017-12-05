@@ -97,6 +97,25 @@ class ModelStore extends EventEmitter {
                 .catch(reject);
         });
     }
+    getAll(options) {
+        var all = [];
+
+        return new Promise((resolve, reject) => {
+            this.store
+                .iterate((model, key, i) => {
+                    all.sort(function(a,b){
+                        var aTime = +new Date(a.createdAt);
+                        var bTime = +new Date(b.createdAt);
+                        return bTime - aTime;
+                    });
+                    all.push(model);
+                })
+                .then(() => {
+                    resolve(all);
+                })
+                .catch(reject);
+        });
+    }
 }
 
 module.exports = ModelStore;

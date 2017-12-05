@@ -1,11 +1,11 @@
-import React from "react";
-import Cookies from "js-cookie";
-import debounce from "lodash.debounce";
-import Result from "./Result.jsx";
-import Login from "./Login.jsx";
-import Searchbar from "./Searchbar.jsx";
-import ModelStore from "../lib/ModelStore";
-import ModelIndex from "../lib/ModelIndex";
+import React from 'react';
+import Cookies from 'js-cookie';
+import debounce from 'lodash.debounce';
+import Result from './Result.jsx';
+import Login from './Login.jsx';
+import Searchbar from './Searchbar.jsx';
+import ModelStore from '../lib/ModelStore';
+import ModelIndex from '../lib/ModelIndex';
 
 class App extends React.Component {
     constructor(props) {
@@ -29,11 +29,14 @@ class App extends React.Component {
         this.modelIndex = new ModelIndex(this.modelStore);
         this.setState({
             isIndexing: true
-        })
+        });
         this.modelIndex.init().then(count => {
             this.setState({
                 isIndexing: false
-            })
+            });
+
+            this.search('');
+
             //Initial sync
             if (count === 0) {
                 this.sync();
@@ -41,10 +44,10 @@ class App extends React.Component {
         });
 
         // Keep index in sync with store
-        this.modelStore.on("add", model => {
+        this.modelStore.on('add', model => {
             this.modelIndex.add(model);
         });
-        this.modelStore.on("remove", model => {
+        this.modelStore.on('remove', model => {
             this.modelIndex.remove(model);
         });
 
@@ -53,8 +56,8 @@ class App extends React.Component {
                 indexCount: this.modelIndex.getCount()
             });
         }, 16);
-        this.modelIndex.on("add", getCount);
-        this.modelIndex.on("remove", getCount);
+        this.modelIndex.on('add', getCount);
+        this.modelIndex.on('remove', getCount);
     }
 
     updateSyncedAt() {
@@ -76,7 +79,7 @@ class App extends React.Component {
     }
 
     logout() {
-        Cookies.remove("token");
+        Cookies.remove('token');
         this.modelStore.clear();
         this.setState({
             indexCount: 0,
@@ -90,17 +93,30 @@ class App extends React.Component {
     }
 
     search(q) {
-        this.setState({ hasSearch: true });
-        this.modelIndex
-            .search(q)
-            .then(results => {
-                this.setState({
-                    results: results
+        this.setState({ hasSearch: true, q: q });
+
+        if (q === '') {
+            this.modelStore
+                .getAll()
+                .then(models => {
+                    console.log(models);
+                    this.setState({ results: models });
+                })
+                .catch(() => {
+                    console.error(error);
                 });
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        } else {
+            this.modelIndex
+                .search(q)
+                .then(results => {
+                    this.setState({
+                        results: results
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
     }
 
     sync() {
@@ -114,11 +130,11 @@ class App extends React.Component {
                 })
                 .catch(error => {
                     this.setState({ isSyncing: false });
-                    console.error("Can not sync: error");
+                    console.error('Can not sync: error');
                 });
         } else {
             this.setState({ isSyncing: false });
-            console.error("Can not sync: missing token");
+            console.error('Can not sync: missing token');
         }
     }
 
