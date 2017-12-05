@@ -126,6 +126,7 @@ class App extends React.Component {
                 .sync(this.state.token)
                 .then(() => {
                     this.setState({ isSyncing: false });
+                    this.search(this.state.q);
                     return this.updateSyncedAt();
                 })
                 .catch(error => {
