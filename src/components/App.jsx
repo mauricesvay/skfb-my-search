@@ -17,9 +17,11 @@ class App extends React.Component {
             isSyncing: false,
             results: [],
             hasSearch: false,
-            token: null
+            token: null,
+            selectedItems: []
         };
         this.modelStore = new ModelStore();
+        this.lastSelectedIndex = null;
     }
 
     init() {
@@ -98,7 +100,7 @@ class App extends React.Component {
     }
 
     search(q) {
-        this.setState({ hasSearch: true, q: q });
+        this.setState({ hasSearch: true, q: q, selectedItems: [] });
 
         if (q === "") {
             this.modelStore
@@ -121,6 +123,33 @@ class App extends React.Component {
                     console.error(error);
                 });
         }
+    }
+
+    handleSelect(id, value, options) {
+        var models = this.state.results;
+        var index = models.findIndex(model => {
+            return model.uid === id;
+        });
+
+        var newSelectedItems = this.state.selectedItems.slice(0);
+
+        if (options.shiftKey) {
+            if (this.lastSelectedIndex) {
+                var from = Math.min(this.lastSelectedIndex.index, index);
+                var to = Math.max(this.lastSelectedIndex.index, index);
+                var state = this.lastSelectedIndex.state;
+                for (var i = from; i <= to; i++) {
+                    newSelectedItems[i] = state; //state should be state of last item? e.g GMail
+                }
+            }
+        } else {
+            newSelectedItems[index] = !newSelectedItems[index];
+            this.lastSelectedIndex = { index: index, state: value };
+        }
+
+        this.setState({
+            selectedItems: newSelectedItems
+        });
     }
 
     sync() {
@@ -147,8 +176,15 @@ class App extends React.Component {
         if (this.state.results.length > 0) {
             return (
                 <div className="results">
-                    {this.state.results.map(result => {
-                        return <Result key={result.uid} model={result} />;
+                    {this.state.results.map((result, index) => {
+                        return (
+                            <Result
+                                key={result.uid}
+                                model={result}
+                                selected={!!this.state.selectedItems[index]}
+                                handleSelect={this.handleSelect.bind(this)}
+                            />
+                        );
                     })}
                 </div>
             );
@@ -166,6 +202,10 @@ class App extends React.Component {
 
     render() {
         if (this.state.token) {
+            var selectedCount = this.state.selectedItems.length
+                ? this.state.selectedItems.reduce((acc, value) => (value ? acc + 1 : acc), 0)
+                : 0;
+
             return (
                 <div>
                     <Searchbar
@@ -178,6 +218,9 @@ class App extends React.Component {
                         onLogout={this.logout.bind(this)}
                     />
                     <div className="container">
+                        <div className="btn-toolbar py-2" role="toolbar" aria-label="Models Toolbar">
+                            Selected: {selectedCount}
+                        </div>
                         <div className="list-group">{this.renderResults()}</div>
                     </div>
                 </div>
