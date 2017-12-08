@@ -26,6 +26,11 @@ class App extends React.Component {
         // Update status
         this.updateSyncedAt();
 
+        // Refresh sync time regularly
+        window.setInterval(() => {
+            this.updateSyncedAt();
+        }, 60 * 1000);
+
         this.modelIndex = new ModelIndex(this.modelStore);
         this.setState({
             isIndexing: true
