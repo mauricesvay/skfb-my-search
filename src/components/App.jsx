@@ -1,11 +1,19 @@
 import React from "react";
 import Cookies from "js-cookie";
 import debounce from "lodash.debounce";
+import uniq from "lodash.uniq";
 import Result from "./Result.jsx";
 import Login from "./Login.jsx";
 import Searchbar from "./Searchbar.jsx";
 import ModelStore from "../lib/ModelStore";
 import ModelIndex from "../lib/ModelIndex";
+import SketchfabApi from "../lib/sketchfab";
+
+import ReactModal from "react-modal";
+import ActionsPopup from "./popups/Actions.jsx";
+
+ReactModal.setAppElement("#root");
+var sketchfabApi = new SketchfabApi();
 
 class App extends React.Component {
     constructor(props) {
@@ -18,10 +26,16 @@ class App extends React.Component {
             results: [],
             hasSearch: false,
             token: null,
-            selectedItems: []
+            selectedItems: [],
+            isShadingModalOpen: false,
+            categories: []
         };
         this.modelStore = new ModelStore();
         this.lastSelectedIndex = null;
+
+        this.openPopup = this.openPopup.bind(this);
+        this.closePopup = this.closePopup.bind(this);
+        this.onPopupSubmit = this.onPopupSubmit.bind(this);
     }
 
     init() {
@@ -65,6 +79,21 @@ class App extends React.Component {
         }, 16);
         this.modelIndex.on("add", getCount);
         this.modelIndex.on("remove", getCount);
+
+        this.fetchCategories();
+    }
+
+    fetchCategories() {
+        sketchfabApi
+            .getCategories()
+            .then(categories => {
+                this.setState({
+                    categories: categories
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
 
     updateSyncedAt() {
@@ -83,6 +112,7 @@ class App extends React.Component {
 
     login(token) {
         this.setState({ token: token }, this.init.bind(this));
+        sketchfabApi = new SketchfabApi({token:token});
     }
 
     logout() {
@@ -97,6 +127,7 @@ class App extends React.Component {
             token: null
         });
         this.init();
+        sketchfabApi = new SketchfabApi();
     }
 
     search(q) {
@@ -149,6 +180,38 @@ class App extends React.Component {
 
         this.setState({
             selectedItems: newSelectedItems
+        });
+    }
+
+    openPopup() {
+        this.setState({
+            isShadingModalOpen: true
+        });
+    }
+
+    closePopup() {
+        this.setState({
+            isShadingModalOpen: false
+        });
+    }
+
+    onPopupSubmit(category) {
+        var tasks = [];
+        this.state.selectedItems.map((item, index) => {
+            var model = this.state.results[index];
+            var newCategories = uniq(model.categories.map(cat => cat.slug).concat([category]));
+            tasks.push({
+                uid: model.uid,
+                categories: newCategories
+            });
+        });
+
+        var promises = [];
+        for (var i=0; i<tasks.length; i++) {
+            promises.push(sketchfabApi.patchModel(tasks[i]));
+        }
+        Promise.all(promises).then(() => {
+            this.sync();
         });
     }
 
@@ -218,11 +281,30 @@ class App extends React.Component {
                         onLogout={this.logout.bind(this)}
                     />
                     <div className="container">
-                        <div className="btn-toolbar py-2" role="toolbar" aria-label="Models Toolbar">
-                            Selected: {selectedCount}
+                        <div
+                            className="btn-toolbar py-2"
+                            role="toolbar"
+                            aria-label="Models Toolbar"
+                        >
+                            <div className="btn-group mr-2" role="group" aria-label="3D Settings">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={this.openPopup}
+                                >
+                                    Add category
+                                </button>
+                            </div>
                         </div>
                         <div className="list-group">{this.renderResults()}</div>
                     </div>
+                    <ActionsPopup
+                        categories={this.state.categories}
+                        isOpen={this.state.isShadingModalOpen}
+                        onRequestClose={this.closePopup}
+                        selectedItems={this.state.selectedItems}
+                        onSubmit={this.onPopupSubmit}
+                    />
                 </div>
             );
         } else {

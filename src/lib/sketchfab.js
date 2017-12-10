@@ -6,6 +6,7 @@ const ME_ENDPOINT = "/v3/me";
 const MY_MODELS_ENDPOINT = "/v3/me/models";
 const SEARCH_ENDPOINT = "/v3/search";
 const USERS_ENDPOINT = "/v3/users";
+const CATEGORIES_ENDPOINT = "/v3/categories";
 
 function Sketchfab(auth) {
     this.auth = auth;
@@ -34,6 +35,17 @@ Sketchfab.prototype.getModels = function getModels(options) {
             .then(response => {
                 resolve(response.data);
             })
+            .catch(reject);
+    });
+};
+
+Sketchfab.prototype.patchModel = function patchModel(options) {
+    var instance = this.getAxiosInstance();
+    var url = '/v3/models/' + options.uid;
+    return new Promise((resolve, reject) => {
+        instance
+            .patch(url, options)
+            .then(resolve)
             .catch(reject);
     });
 };
@@ -137,6 +149,22 @@ Sketchfab.prototype.me = function() {
             .get(ME_ENDPOINT)
             .then(response => {
                 resolve(response.data);
+            })
+            .catch(reject);
+    });
+};
+
+Sketchfab.prototype.getCategories = function getCategories() {
+    var instance = this.getAxiosInstance();
+    return new Promise((resolve, reject) => {
+        instance
+            .get(CATEGORIES_ENDPOINT)
+            .then(response => {
+                if (response.data && response.data.results) {
+                    resolve(response.data.results);
+                } else {
+                    reject('No categories found');
+                }
             })
             .catch(reject);
     });
