@@ -1,7 +1,6 @@
 import React from "react";
 import Cookies from "js-cookie";
 import debounce from "lodash.debounce";
-import uniq from "lodash.uniq";
 import Result from "./Result.jsx";
 import Login from "./Login.jsx";
 import Searchbar from "./Searchbar.jsx";
@@ -10,7 +9,9 @@ import ModelIndex from "../lib/ModelIndex";
 import SketchfabApi from "../lib/sketchfab";
 
 import ReactModal from "react-modal";
-import ActionsPopup from "./popups/Actions.jsx";
+
+import CategoriesPopup from "./popups/Categories.jsx";
+import { updateCategory } from "./popups/Categories.jsx";
 
 ReactModal.setAppElement("#root");
 var sketchfabApi = new SketchfabApi();
@@ -112,7 +113,7 @@ class App extends React.Component {
 
     login(token) {
         this.setState({ token: token }, this.init.bind(this));
-        sketchfabApi = new SketchfabApi({token:token});
+        sketchfabApi = new SketchfabApi({ token: token });
     }
 
     logout() {
@@ -195,22 +196,13 @@ class App extends React.Component {
         });
     }
 
-    onPopupSubmit(category) {
-        var tasks = [];
-        this.state.selectedItems.map((item, index) => {
-            var model = this.state.results[index];
-            var newCategories = uniq(model.categories.map(cat => cat.slug).concat([category]));
-            tasks.push({
-                uid: model.uid,
-                categories: newCategories
-            });
+    onCategoryPopupSubmit(category) {
+        var models = this.state.selectedItems.map((item, index) => {
+            return this.state.results[index];
         });
 
-        var promises = [];
-        for (var i=0; i<tasks.length; i++) {
-            promises.push(sketchfabApi.patchModel(tasks[i]));
-        }
-        Promise.all(promises).then(() => {
+        updateCategory(models, category, sketchfabApi).then(()=>{
+            console.log('Categories updated');
             this.sync();
         });
     }
@@ -298,12 +290,12 @@ class App extends React.Component {
                         </div>
                         <div className="list-group">{this.renderResults()}</div>
                     </div>
-                    <ActionsPopup
+                    <CategoriesPopup
                         categories={this.state.categories}
                         isOpen={this.state.isShadingModalOpen}
                         onRequestClose={this.closePopup}
                         selectedItems={this.state.selectedItems}
-                        onSubmit={this.onPopupSubmit}
+                        onSubmit={this.onCategoryPopupSubmit}
                     />
                 </div>
             );

@@ -1,5 +1,6 @@
 import React from "react";
 import ReactModal from "react-modal";
+import uniq from "lodash.uniq";
 
 var overlayStyles = {
     backgroundColor: "rgba(0,0,0,0.5)",
@@ -20,7 +21,7 @@ var contentStyles = {
     bottom: "auto"
 };
 
-class ActionsPopup extends React.Component {
+class CategoriesPopup extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -76,9 +77,15 @@ class ActionsPopup extends React.Component {
                                 onChange={this.handleInputChange}
                                 name="category"
                             >
-                                <option value="" key="null">Select a category</option>
-                                { this.props.categories.map((cat)=>{
-                                    return <option value={cat.slug} key={cat.uid}>{cat.name}</option>
+                                <option value="" key="null">
+                                    Select a category
+                                </option>
+                                {this.props.categories.map(cat => {
+                                    return (
+                                        <option value={cat.slug} key={cat.uid}>
+                                            {cat.name}
+                                        </option>
+                                    );
                                 })}
                             </select>
                         </div>
@@ -94,4 +101,23 @@ class ActionsPopup extends React.Component {
     }
 }
 
-export default ActionsPopup;
+function updateCategory(models, category, sketchfabApi) {
+    var tasks = [];
+    models.map(model => {
+        var newCategories = uniq(model.categories.map(cat => cat.slug).concat([category]));
+        tasks.push({
+            uid: model.uid,
+            categories: newCategories
+        });
+    });
+
+    var promises = [];
+    for (var i = 0; i < tasks.length; i++) {
+        promises.push(sketchfabApi.patchModel(tasks[i]));
+    }
+    return Promise.all(promises);
+}
+
+export default CategoriesPopup;
+
+export { updateCategory };
