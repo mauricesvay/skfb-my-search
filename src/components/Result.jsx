@@ -21,6 +21,14 @@ function getCreatedDate(model) {
     return model.createdAt;
 }
 
+function getPrice(model) {
+    if (model.price) {
+        return ' - $' + model.price / 100;
+    } else {
+        return '';
+    }
+}
+
 class Result extends React.Component {
     constructor(props) {
         super(props);
@@ -73,6 +81,7 @@ class Result extends React.Component {
                         )}
                         <br />
                         <span className="text-muted">{getCreatedDate(model)}</span>
+                        <span className="text-muted">{getPrice(model)}</span>
                     </span>
                 </div>
             </div>
