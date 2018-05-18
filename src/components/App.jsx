@@ -36,7 +36,7 @@ class App extends React.Component {
 
         this.openPopup = this.openPopup.bind(this);
         this.closePopup = this.closePopup.bind(this);
-        this.onPopupSubmit = this.onPopupSubmit.bind(this);
+        this.onCategoryPopupSubmit = this.onCategoryPopupSubmit.bind(this);
     }
 
     init() {
